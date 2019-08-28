@@ -31,33 +31,50 @@ Note:
 0 <= logs.length <= 100
 3 <= logs[i].length <= 100
 logs[i] is guaranteed to have an identifier, and a word after the identifier.
+
+Time Complexity: O(AlogA), where O(AlogA) is the total content of logs.
+The sort process costs O( nlog(n)) time. The sorting algorithm is a modified mergesort (in which the merge is omitted if the highest element in the low sublist is less than the lowest element in the high sublist). This algorithm offers guaranteed n log(n) performance.
+Space Complexity: O(A)
      */
     public String[] reorderLogFiles(String[] logs) {
+        List<String> letterLogs = new ArrayList<>();
+        List<String> digitLogs = new ArrayList<>();
 
-        Comparator<String> myComp = new Comparator<String>() {
-            @Override
-            public int compare(String s1, String s2) {
-                int s1si = s1.indexOf(' ');
-                int s2si = s2.indexOf(' ');
-                char s1fc = s1.charAt(s1si+1);
-                char s2fc = s2.charAt(s2si+1);
-                // if s1 is digital
-                if (s1fc <= '9') {
-                    // all digital, orginal order
-                    if (s2fc <= '9') return 0;
-                    // if s1 is digital, s2 is letter, return 1, s2 在s1 前
-                    else return 1;
-                }
-                // if s1 is letter, s2 is digital, return -1, s1 在 s2 前
-                if (s2fc <= '9') return -1;
-               // if s1 and s2 is letter
-                int preCompute = s1.substring(s1si+1).compareTo(s2.substring(s2si+1));
-                if (preCompute == 0) return s1.substring(0,s1si).compareTo(s2.substring(0,s2si));
-                return preCompute;
+        for (String log : logs) {
+            String[] elements = log.split(" ");
+            if (Character.isLetter(elements[1].charAt(0))) {
+                letterLogs.add(log);
+            } else {
+                digitLogs.add(log);
             }
-        };
+        }
 
-        Arrays.sort(logs, myComp);
+        letterLogs.sort((o1, o2) -> {
+            String[] s1 = o1.split(" ");
+            String[] s2 = o2.split(" ");
+            String id1 = s1[0];
+            String id2 = s2[0];
+            int len1 = s1.length;
+            int len2 = s2.length;
+
+            for (int i = 1; i < Math.min(len1, len2); i++) {
+                if (!s1[i].equals(s2[i])) {
+                    return s1[i].compareTo(s2[i]);
+                } else if (i == Math.min(len1, len2) - 1 && s1[i].equals(s2[i])) {
+                    return id1.compareTo(id2);
+                }
+            }
+            return 0;
+        });
+
+        for (int i = 0; i < logs.length; i++) {
+            if (i < letterLogs.size()) {
+                logs[i] = letterLogs.get(i);
+            } else {
+                logs[i] = digitLogs.get(i - letterLogs.size());
+            }
+        }
+
         return logs;
     }
 }
