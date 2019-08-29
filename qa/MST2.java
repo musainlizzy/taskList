@@ -53,6 +53,7 @@ class Solution {
         int res = 0;
 
         for (int[] c : connections) {
+            // x is the first city, y is the second city
             int x = c[0], y = c[1];
             if (find(x) != find(y)) {
                 res += c[2];
